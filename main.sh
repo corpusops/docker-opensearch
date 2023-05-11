@@ -281,10 +281,12 @@ NODE_TOP="$(echo $(find_top_node))"
 MAILU_VERSiON=1.7
 
 BATCHED_IMAGES="\
-opensearchproject/opensearch/1.0.0\
+opensearchproject/opensearch/1.2.2\
+ opensearchproject/opensearch/1.0.0\
  opensearchproject/opensearch/1.0.1\
  opensearchproject/opensearch/1.1.0\
  opensearchproject/opensearch/1.2.0\
+ opensearchproject/opensearch/1.2.1\
  opensearchproject/opensearch/latest::89
 "
 SKIP_REFRESH_ANCESTORS=${SKIP_REFRESH_ANCESTORS-}
