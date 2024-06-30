@@ -1,4 +1,4 @@
-FROM opensearchproject/opensearch:latest
+FROM opensearchproject/opensearch:1.2.4
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
 ARG INSTALL_DEFAULT_LOCALE="fr_FR.UTF-8"

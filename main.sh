@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+
 shopt -s extglob
 ## refresh from corpsusops.bootstrap/hacking/shell_glue (copy paste until last function)
 readlinkf() {
@@ -253,6 +254,7 @@ SKIP_MINIO="(k8s-operator|((minio|mc):(RELEASE.)?[0-9]{4}-.{7}))"
 SKIP_MAILU="(mailu.*(feat|patch|merg|refactor|revert|upgrade|fix-|pr-template))"
 SKIP_DOCKER="docker(\/|:)([0-9]+\.[0-9]+\.|17|18.0[1-6]|1$|1(\.|-)).*"
 SKIPPED_TAGS="$SKIP_TF|$SKIP_MINOR_OS|$SKIP_NODE|$SKIP_DOCKER|$SKIP_MINIO|$SKIP_MAILU|$SKIP_MINOR_ES2|$SKIP_MINOR|$SKIP_PRE|$SKIP_OS|$SKIP_PHP|$SKIP_WINDOWS|$SKIP_MISC|[1-2].*\.20......|:20..\."
+SKIPPED_TAGS="$SKIPPED_TAGS|1.3.0|1.3.1|1.3.2|1.3.3|1.3.4|1.3.5|1.3.6|2.0.0|2.0.1|2.1.0|2.2.0|2.2.1|2.3.0"
 CURRENT_TS=$(date +%s)
 IMAGES_SKIP_NS="((mailhog|postgis|pgrouting(-bare)?|^library|dejavu|(minio/(minio|mc))))"
 
@@ -281,12 +283,10 @@ NODE_TOP="$(echo $(find_top_node))"
 MAILU_VERSiON=1.7
 
 BATCHED_IMAGES="\
+opensearchproject/opensearch/2\
+ opensearchproject/opensearch/2.4.0::89
 opensearchproject/opensearch/1.2.2\
- opensearchproject/opensearch/1.0.0\
- opensearchproject/opensearch/1.0.1\
- opensearchproject/opensearch/1.1.0\
- opensearchproject/opensearch/1.2.0\
- opensearchproject/opensearch/1.2.1\
+ opensearchproject/opensearch/1\
  opensearchproject/opensearch/latest::89
 "
 SKIP_REFRESH_ANCESTORS=${SKIP_REFRESH_ANCESTORS-}

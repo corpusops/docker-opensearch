@@ -65,7 +65,8 @@ jobs:
       fail-fast: false
       matrix:
         IMAGES:
-        - "opensearchproject/opensearch/1.0.0 opensearchproject/opensearch/1.0.1 opensearchproject/opensearch/1.1.0 opensearchproject/opensearch/1.2.0 opensearchproject/opensearch/latest"
+        - "opensearchproject/opensearch/2 opensearchproject/opensearch/2.4.0"
+        - "opensearchproject/opensearch/1.2.2 opensearchproject/opensearch/1 opensearchproject/opensearch/latest"
         #- "corpusops/test/a corpusops/test/b corpusops/test/c"
         # all images that werent explicitly told to be built would be built in the next batches
         # we span them onto N jobs
