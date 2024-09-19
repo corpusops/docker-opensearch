@@ -1,6 +1,9 @@
-FROM opensearchproject/opensearch:latest
+ARG ANCESTOR=opensearchproject/opensearch:latest
+ARG RSYNC=corpusops/rsync
+FROM opensearchproject/opensearch:latest AS final
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
+ARG DEBIAN_FRONTEND=noninteractive
 ARG INSTALL_DEFAULT_LOCALE="fr_FR.UTF-8"
 ARG EXTRA_FILES_LIST=""
 ARG COPS_SYSTEM=${_cops_SYSTEM}
@@ -84,4 +87,15 @@ RUN sh -c 'set -ex \
     && ./common_clean.sh \
     && cd / && rm -rf /tmp/corpusopssteroids /var/cache/apk/* /var/lib/apt/lists/*'
 USER 1000
+USER root
+FROM $RSYNC AS squashed-rsync
+FROM $ANCESTOR AS squashed-ancestor
+ARG ROOTFS="/BASE_ROOTFS_TO_COPY_THAT_WONT_COLLIDE_1234567890"
+ARG PATH="${ROOTFS}_rsync/bin:$PATH"
+SHELL ["busybox",  "sh", "-c"]
+RUN --mount=type=bind,from=final,target=$ROOTFS --mount=type=bind,from=squashed-rsync,target=${ROOTFS}_rsync \
+rsync -Aaz --delete ${ROOTFS}/ / --exclude=/proc --exclude=/sys --exclude=/etc/resolv.conf --exclude=/etc/hosts --exclude=$ROOTFS* --exclude=dev/shm --exclude=dev/pts --exclude=dev/mqueue
+SHELL ["/bin/sh", "-c"]
+USER 1000
+ARG DOCKER_IMAGES_COMMIT="$DOCKER_IMAGES_COMMIT"
 LABEL com.github.corpusops.docker-images-commit="$DOCKER_IMAGES_COMMIT"
