@@ -1,6 +1,6 @@
-ARG ANCESTOR=opensearchproject/opensearch:1.2.2
+ARG ANCESTOR=opensearchproject/opensearch:2.15.0
 ARG RSYNC=corpusops/rsync
-FROM opensearchproject/opensearch:1.2.2 AS final
+FROM opensearchproject/opensearch:2.15.0 AS final
 ARG DO_UPDATE=y
 ARG NONINTERACTIVE=y
 ARG DEBIAN_FRONTEND=noninteractive
