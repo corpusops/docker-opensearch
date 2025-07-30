@@ -262,9 +262,10 @@ SKIPPED_TAGS="$SKIP_TF|$SKIP_MINOR_OS|$SKIP_NODE|$SKIP_DOCKER|$SKIP_MINIO|$SKIP_
 CURRENT_TS=$(date +%s)
 IMAGES_SKIP_NS="((mailhog|postgis|pgrouting(-bare)?|^library|dejavu|(minio/(minio|mc))))"
 
-SKIPPED_TAGS="$SKIP_MINOR_OS|$SKIP_MINOR_ES2|$SKIP_MINOR|$SKIP_PRE|$SKIP_OS|$SKIP_MISC|[1-2].*\.20......|:20..\."
-SKIPPED_TAGS="$SKIPPED_TAGS|1.3.0|1.3.1|1.3.2|1.3.3|1.3.4|1.3.5|1.3.6|2.0.0|2.0.1|2.1.0|2.2.0|2.2.1|2.3.0"
-SKIPPED_TAGS="$SKIPPED_TAGS|1.3.7|1.3.8|1.3.9|2.10.0|2.11.0|2.11.1|2.12.0|2.13.0|2.14.0|2.4.1|2.5.0|2.8.0|2.9.0"
+OPENSEARCH_SKIPPED_TAGS="opensearch:([0-9]+\.[0-9]+$)?|[1-2].*\.20......|20..\.)"
+OPENSEARCH_PROTECTED_VERSIONS="opensearch:(1|1.0.0|1.0.1|1.1.0|1.2.0|1.2.1|1.2.2|1.2.3|1.2.4|2|2.15.0|2.4.0|latest)$"
+PROTECTED_VERSIONS="$OPENSEARCH_PROTECTED_VERSIONS"
+SKIPPED_TAGS="$OPENSEARCH_SKIPPED_TAGS"
 
 default_images="
 opensearchproject/opensearch
@@ -484,6 +485,10 @@ gen_image() {
 is_skipped() {
     local ret=1 t="$@"
     if [[ -z $SKIPPED_TAGS ]];then return 1;fi
+    if [[ -n "${PROTECTED_VERSIONS}" ]] && ( echo "$t" | grep -E -q "$PROTECTED_VERSIONS" );then
+        debug "$t is protected, no skip"
+        return 1
+    fi
     if ( echo "$t" | grep -E -q "$SKIPPED_TAGS" );then
         ret=0
     fi
@@ -560,7 +565,7 @@ get_image_tags() {
     changed=
     if [[ "x${ONLY_ONE_MINOR}" != "x" ]] && ( echo $n | grep -E -q "$ONLY_ONE_MINOR" );then
         oomt=""
-        for ix in $(seq 0 30);do
+        for ix in $(seq 0 99);do
             if ! ( echo "$atags" | grep -E -q "^$ix\." );then continue;fi
             for j in $(seq 0 99);do
                 if ! ( echo "$atags" | grep -E -q "^$ix\.${j}\." );then continue;fi
@@ -583,10 +588,12 @@ get_image_tags() {
                     fi
                     if [[ -n "$selected" ]];then
                         for l in $(echo "$selected"|sed -e "$ d");do
-                            if [[ -z $oomt ]];then
-                                oomt="$l$"
-                            else
-                                oomt="$oomt|$l"
+                            if [[ -z "${PROTECTED_VERSIONS}" ]] || ! ( echo "$n:$l" | grep "${PROTECTED_VERSIONS}" );then
+                                if [[ -z $oomt ]];then
+                                    oomt="$l$"
+                                else
+                                    oomt="$oomt|$l"
+                                fi
                             fi
                         done
                     fi
@@ -599,7 +606,7 @@ get_image_tags() {
     fi
     if [[ -z ${SKIP_TAGS_REBUILD} ]];then
         rm -f "$t"
-        filter_tags "$atags" > $t
+        filter_tags "$atags" > "$t"
     fi
     set -e
     if [ -e "$t" ];then cat "$t";fi
